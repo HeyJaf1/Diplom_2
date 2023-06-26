@@ -5,6 +5,7 @@ import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
 import jdk.jfr.Description;
 import org.apache.http.HttpStatus;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import userData.UserDataChangeSteps;
@@ -12,6 +13,7 @@ import userData.UserDataChangeSteps;
 public class UserDataChangeTest {
 
     private UserDataChangeSteps step;
+
 
     @Before
     @Step("Создание объектов для проведения тестов.")
@@ -27,6 +29,7 @@ public class UserDataChangeTest {
     public void wouldChangeEmail() {
         ValidatableResponse responseEmailChanged = step.changingUserEmail();
         responseEmailChanged.assertThat().statusCode(HttpStatus.SC_OK);
+
     }
 
     @Test
@@ -80,5 +83,11 @@ public class UserDataChangeTest {
     public void wouldChangeNameNonAuthorizedUser() {
         ValidatableResponse responseEmailChanged = step.changingNotAuthorizedUserName();
         responseEmailChanged.assertThat().statusCode(HttpStatus.SC_UNAUTHORIZED);
+    }
+
+    @After
+    @DisplayName("Удаление пользователя.")
+    public void tearDown() {
+        step.deleteUser();
     }
 }

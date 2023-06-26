@@ -12,6 +12,7 @@ public class UserLoginSteps {
     protected final String BASE_URI = "https://stellarburgers.nomoreparties.site";
     protected final String USER_CREATE_URI = BASE_URI + "/api/auth/register";
     protected final String USER_LOGIN_URI = BASE_URI + "/api/auth/login";
+    protected final String DELETE_USER = BASE_URI + "/api/auth/user";
 
     @Description("Создание спецификации")
     private RequestSpecification getSpec() {
@@ -59,5 +60,21 @@ public class UserLoginSteps {
                 .then()
                 .log()
                 .all();
+    }
+
+    @Step("Удаление пользователя.")
+    public ValidatableResponse deleteUser() {
+        ValidatableResponse responseCreate = logging(new UserLogin());
+
+        StringBuilder stringBuilder = new StringBuilder(responseCreate.extract().path("accessToken"));
+        stringBuilder.replace(0, 7, "");
+        String modifiedAccessToken = stringBuilder.toString();
+
+        return given().log().all()
+                .spec(getSpec())
+                .auth().oauth2(modifiedAccessToken)
+                .when()
+                .delete(DELETE_USER)
+                .then();
     }
 }

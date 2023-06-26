@@ -10,6 +10,7 @@ import jdk.jfr.Description;
 import login.UserLogin;
 import login.UserLoginSteps;
 import org.apache.http.HttpStatus;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,5 +43,10 @@ public class UserLoginTest {
     public void wouldNotLogAUser() {
         ValidatableResponse responseCreate = step.loggingWithInvalidData(userLogin);
         responseCreate.assertThat().statusCode(HttpStatus.SC_UNAUTHORIZED);
+    }
+    @After
+    @DisplayName("Удаление пользователя.")
+    public void tearDown() {
+        step.deleteUser();
     }
 }

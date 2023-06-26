@@ -5,6 +5,8 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import jdk.jfr.Description;
+import login.UserLogin;
+import login.UserLoginSteps;
 
 import static io.restassured.RestAssured.given;
 
@@ -14,6 +16,9 @@ public class UserDataChangeSteps {
     protected final String USER_CREATE_URI = BASE_URI + "/api/auth/register";
     protected final String USER_LOGIN_URI = BASE_URI + "/api/auth/login";
     protected final String PATCH_CHANGE_USER_DATA = BASE_URI + "/api/auth/user";
+    protected final String DELETE_USER = BASE_URI + "/api/auth/user";
+
+    UserLoginSteps userLoginSteps = new UserLoginSteps();
 
     @Description("Создание спецификации, общее для всех @steps.")
     private RequestSpecification getSpec() {
@@ -149,5 +154,21 @@ public class UserDataChangeSteps {
                 .then()
                 .log()
                 .all();
+    }
+
+    @Step("Удаление пользователя.")
+    public ValidatableResponse deleteUser() {
+        ValidatableResponse responseCreate = userLoginSteps.logging(new UserLogin());
+
+        StringBuilder stringBuilder = new StringBuilder(responseCreate.extract().path("accessToken"));
+        stringBuilder.replace(0, 7, "");
+        String modifiedAccessToken = stringBuilder.toString();
+
+        return given().log().all()
+                .spec(getSpec())
+                .auth().oauth2(modifiedAccessToken)
+                .when()
+                .delete(DELETE_USER)
+                .then();
     }
 }
