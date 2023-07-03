@@ -2,23 +2,38 @@ package userDataChangeTests;
 
 import io.qameta.allure.*;
 import io.qameta.allure.junit4.DisplayName;
+import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import jdk.jfr.Description;
+import login.Generator;
+import login.UserCredentials;
+import login.UserLogin;
 import org.apache.http.HttpStatus;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import userData.UserDataChangeSteps;
 
+import static org.apache.http.HttpStatus.SC_OK;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class UserDataChangeTest {
 
     private UserDataChangeSteps step;
-
+    private UserLogin user;
+    private String accessToken;
 
     @Before
     @Step("Создание объектов для проведения тестов.")
     public void setUp() {
+       // step = new UserDataChangeSteps();
+
+        user = Generator.getRandomUser();
         step = new UserDataChangeSteps();
+        step.createUser(user);
+        Response loginResponse = step.login(UserCredentials.from(user));
+        accessToken = loginResponse.body().jsonPath().getString("accessToken");
     }
 
     @Test
@@ -27,8 +42,14 @@ public class UserDataChangeTest {
     @Severity(SeverityLevel.NORMAL)
     @TmsLink("https://practicum.yandex.ru/learn/qa-automation-engineer-java/courses/5c87a15a-37d9-4d06-8e7d-3ebe49aba2fb/sprints/72940/topics/7ec6ef07-a3d5-4923-a8ac-64313ac438e1/lessons/311b7751-0b28-438a-adb4-732ca7080912/")
     public void wouldChangeEmail() {
-        ValidatableResponse responseEmailChanged = step.changingUserEmail();
-        responseEmailChanged.assertThat().statusCode(HttpStatus.SC_OK);
+        UserLogin updatEmailUser = new UserLogin(Generator.getRandomUser().getEmail(), user.getPassword(), user.getName());
+        Response UpdateUserResponse = step.updateUser(updatEmailUser, accessToken);
+        int statusCode = UpdateUserResponse.getStatusCode();
+        assertEquals(SC_OK, statusCode);
+        boolean isUpdateUserResponseSuccess = UpdateUserResponse.jsonPath().getBoolean("success");
+        assertTrue(isUpdateUserResponseSuccess);
+        String email = UpdateUserResponse.jsonPath().getString("user.email");
+        assertEquals(updatEmailUser.getEmail().toLowerCase(), email);
 
     }
 
@@ -88,6 +109,6 @@ public class UserDataChangeTest {
     @After
     @DisplayName("Удаление пользователя.")
     public void tearDown() {
-        step.deleteUser();
+        step.deleteUser(accessToken);
     }
 }

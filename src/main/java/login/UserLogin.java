@@ -1,5 +1,8 @@
 package login;
 
+import lombok.Data;
+
+@Data
 public class UserLogin {
 
     private String email;
@@ -7,6 +10,12 @@ public class UserLogin {
     private String name;
 
     public UserLogin() {}
+
+    public UserLogin(String email, String password, String name) {
+        this.email = email;
+        this.password = password;
+        this.name = name;
+    }
 
     public UserLogin setEmail(String email) {
         this.email = email;

@@ -2,13 +2,16 @@ package userData;
 
 import io.qameta.allure.Step;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import jdk.jfr.Description;
+import login.UserCredentials;
 import login.UserLogin;
 import login.UserLoginSteps;
 
 import static io.restassured.RestAssured.given;
+import static login.RestClient.getBaseSpecSettings;
 
 public class UserDataChangeSteps {
 
@@ -17,14 +20,49 @@ public class UserDataChangeSteps {
     protected final String USER_LOGIN_URI = BASE_URI + "/api/auth/login";
     protected final String PATCH_CHANGE_USER_DATA = BASE_URI + "/api/auth/user";
     protected final String DELETE_USER = BASE_URI + "/api/auth/user";
-
-    UserLoginSteps userLoginSteps = new UserLoginSteps();
+    private static final String UPDATE_OR_DELETE = "auth/user/";
+    private static final String REGISTER = "auth/register/";
+    private static final String LOGIN = "auth/login/";
 
     @Description("Создание спецификации, общее для всех @steps.")
     private RequestSpecification getSpec() {
         return given().log().all()
                 .contentType(ContentType.JSON)
                 .baseUri(BASE_URI);
+    }
+
+    @Step("Создание пользователя")
+    public Response createUser(UserLogin user) {
+        return (Response) given()
+                .spec(getBaseSpecSettings())
+                .body(user)
+                .when()
+                .post(REGISTER)
+                .then()
+                .extract();
+    }
+
+    @Step("Логин пользователя")
+    public static Response login(UserCredentials creds) {
+        return (Response) given()
+                .spec(getBaseSpecSettings())
+                .body(creds)
+                .when()
+                .post(LOGIN)
+                .then()
+                .extract();
+    }
+
+    @Step("Изменение данных пользователя")
+    public Response updateUser(UserLogin user, String accessToken) {
+        return (Response) given()
+                .spec(getBaseSpecSettings())
+                .header("authorization", accessToken)
+                .body(user)
+                .when()
+                .patch(UPDATE_OR_DELETE)
+                .then()
+                .extract();
     }
 
     @Step("Создание нового пользователя.")
@@ -157,18 +195,19 @@ public class UserDataChangeSteps {
     }
 
     @Step("Удаление пользователя.")
-    public ValidatableResponse deleteUser() {
-        ValidatableResponse responseCreate = userLoginSteps.logging(new UserLogin());
-
-        StringBuilder stringBuilder = new StringBuilder(responseCreate.extract().path("accessToken"));
-        stringBuilder.replace(0, 7, "");
-        String modifiedAccessToken = stringBuilder.toString();
-
-        return given().log().all()
-                .spec(getSpec())
-                .auth().oauth2(modifiedAccessToken)
+    public void deleteUser(String accessToken) {
+        if (accessToken == null) {
+            return;
+        }
+        given()
+                .spec(getBaseSpecSettings())
+                .header("authorization", accessToken)
                 .when()
-                .delete(DELETE_USER)
-                .then();
+                .delete(UPDATE_OR_DELETE)
+                .then()
+                .assertThat()
+                .statusCode(202)
+                .extract()
+                .path("ok");
     }
 }
