@@ -57,7 +57,6 @@ public class UserLoginTest {
                 .statusCode(401);
     }
 
-
     @After
     public void cleanUp() {
         if (accessToken != null) {
