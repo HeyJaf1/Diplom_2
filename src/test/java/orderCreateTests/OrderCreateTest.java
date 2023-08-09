@@ -55,7 +55,7 @@ public class OrderCreateTest {
     @Severity(SeverityLevel.NORMAL)
     public void postOrderWithAuthorization() {
         UserLoginSteps userLoginSteps = new UserLoginSteps();
-        userLoginSteps.logging(UserLoginFieldsGenerator.passingGenerator());
+        userLoginSteps.logging();
         Order order = new Order(Arrays.asList(step.getListOfObj()));
         ValidatableResponse response = step.orderCreate(order);
         response.assertThat().statusCode(HttpStatus.SC_OK);
@@ -76,7 +76,7 @@ public class OrderCreateTest {
     @Description("Успешное получение заказа с проверкой возвращаемого статус-кода 200 ОК в соответствии с документацией.")
     @Severity(SeverityLevel.NORMAL)
     public void getUserOrder() {
-        new UserLoginSteps().logging(new UserLogin());
+        new UserLoginSteps().logging();
         Order order = new Order(List.of(step.getListOfObj()));
         step.orderCreate(order);
         ValidatableResponse responseGetOrder = step.getTheOrder(order);

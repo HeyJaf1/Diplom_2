@@ -76,7 +76,7 @@ public class OrderCreateSteps {
 
     @Step("Получение заказа авторизованным пользователем.")
     public ValidatableResponse getTheOrder(Order order) {
-        String accessToken = userLoginSteps.logging(new UserLogin()).extract().path("accessToken");
+        String accessToken = userLoginSteps.logging().extract().path("accessToken");
         orderCreate(order);
 
         return getSpec()

@@ -12,7 +12,6 @@ public class UserLoginSteps {
     protected final String BASE_URI = "https://stellarburgers.nomoreparties.site";
     protected final String USER_CREATE_URI = BASE_URI + "/api/auth/register";
     protected final String USER_LOGIN_URI = BASE_URI + "/api/auth/login";
-    protected final String DELETE_USER = BASE_URI + "/api/auth/user";
 
     @Description("Создание спецификации")
     private RequestSpecification getSpec() {
@@ -31,8 +30,8 @@ public class UserLoginSteps {
     }
 
     @Step("Вход")
-    public ValidatableResponse logging(UserLogin userLogin) {
-        userLogin = UserLoginFieldsGenerator.passingGenerator();
+    public ValidatableResponse logging() {
+        UserLogin userLogin = UserLoginFieldsGenerator.passingGenerator();
         ValidatableResponse responseCreate = create(userLogin);
         String accessToken = responseCreate.extract().path("accessToken");
         return getSpec()
@@ -44,37 +43,5 @@ public class UserLoginSteps {
                 .then()
                 .log()
                 .all();
-    }
-
-    @Step("Вход с неверным логином и паролем.")
-    public ValidatableResponse loggingWithInvalidData(UserLogin userLogin) {
-        userLogin = UserLoginFieldsGenerator.passingGenerator();
-        ValidatableResponse responseCreate = create(userLogin);
-        String accessToken = responseCreate.extract().path("accessToken");
-        return getSpec()
-                .auth().oauth2(accessToken)
-                .and()
-                .body(UserLoginFieldsGenerator.passingGeneratorInvalid())
-                .when()
-                .post(USER_LOGIN_URI)
-                .then()
-                .log()
-                .all();
-    }
-
-    @Step("Удаление пользователя.")
-    public ValidatableResponse deleteUser() {
-        ValidatableResponse responseCreate = logging(new UserLogin());
-
-        StringBuilder stringBuilder = new StringBuilder(responseCreate.extract().path("accessToken"));
-        stringBuilder.replace(0, 7, "");
-        String modifiedAccessToken = stringBuilder.toString();
-
-        return given().log().all()
-                .spec(getSpec())
-                .auth().oauth2(modifiedAccessToken)
-                .when()
-                .delete(DELETE_USER)
-                .then();
     }
 }
