@@ -21,10 +21,6 @@ public class UserLoginFieldsGenerator {
         return new UserLogin().setEmail(email()).setPassword(password()).setName(name());
     }
 
-    public static UserLogin passingGeneratorInvalid() {
-        return new UserLogin().setEmail("11").setPassword("Password").setName("Name");
-    }
-
     public static String password() {
         int max = 12;
         int min = 6;

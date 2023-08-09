@@ -5,7 +5,6 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import jdk.jfr.Description;
-import login.UserLogin;
 import login.UserLoginSteps;
 
 import java.util.List;
@@ -16,7 +15,6 @@ import static io.restassured.RestAssured.given;
 public class OrderCreateSteps {
 
     ListOfIngredients listOfIngredients = new ListOfIngredients();
-    UserLoginSteps step;
     UserLoginSteps userLoginSteps = new UserLoginSteps();
     protected final String BASE_URI = "https://stellarburgers.nomoreparties.site";
     protected final String GET_INGREDIENTS_LIST = BASE_URI + "/api/ingredients";

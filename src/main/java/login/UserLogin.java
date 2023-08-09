@@ -11,12 +11,6 @@ public class UserLogin {
 
     public UserLogin() {}
 
-    public UserLogin(String email, String password, String name) {
-        this.email = email;
-        this.password = password;
-        this.name = name;
-    }
-
     public UserLogin setEmail(String email) {
         this.email = email;
         return this;

@@ -21,25 +21,5 @@ public class UserRandomData {
                 faker.internet().emailAddress(),
                 faker.internet().password());
     }
-    @Step("Создание пользователя с рандомными данными без почты")
-    public static User createRandomNoEmailUser() {
-        return new User(
-                faker.name().firstName(),
-                "",
-                faker.internet().password());
-    }
-    @Step("Создание пользователя с рандомными данными без пароля")
-    public static User createRandomNoPasswordUser() {
-        return new User(
-                faker.name().firstName(),
-                faker.internet().emailAddress(),
-                "");
-    }
-    @Step("Создание пользователя с пустыми данными")
-    public static User createRandomNoDataUser() {
-        return new User(
-                "",
-                "",
-                "");
-    }
+
 }
