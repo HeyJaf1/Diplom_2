@@ -7,8 +7,6 @@ import io.qameta.allure.TmsLink;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
 import jdk.jfr.Description;
-import login.UserLogin;
-import login.UserLoginFieldsGenerator;
 import login.UserLoginSteps;
 import order.Order;
 import order.OrderCreateSteps;
